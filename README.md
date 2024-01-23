@@ -166,9 +166,7 @@ id username
 
 * `var`      : variable files for services Like Apache , FTP , SMTP , and so on  
 
-* `media` , `mount` , `mnt`
-
-* used for mounting files and accessing removable media ex CD-ROM and USB or any another Mircocontroller Like raspberry pi
+* `media` , `mount` , `mnt` used for mounting files and accessing removable media ex CD-ROM and USB or any another Mircocontroller Like raspberry pi
   
   > you can remove it and mount disks any where but it comes as stander 
   
@@ -180,7 +178,7 @@ id username
   mount /dev/sda3 /usr/local_mount/
   ```
 
-* `run`      :  running process
+* `run` ,`sys`    :  running process used by kernel 
 
 * `opt`      : optinal files you can remove it
 
@@ -209,3 +207,7 @@ id username
 > kernel who's have access to write there 
 > 
 > and root but root by using force
+
+
+
+---
