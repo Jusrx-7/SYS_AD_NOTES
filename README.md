@@ -208,6 +208,151 @@ id username
 > 
 > and root but root by using force
 
-
-
 ---
+
+### some Short-Cuts
+
+1. cd 
+   
+       `cd -` cd to last dir i was there     
+
+```bash
+cd /root/Downloads
+cd /home
+cd - == cd /root/Downloads 
+# and sometimes you forget whre you was so use
+cd - 
+```
+
+`cd ~usernam`  ==  `cd /home/username`
+
+2. `touch` for Creating empty `text` File  
+
+```bash
+touch file file1 file2 ...
+```
+
+> will Creat empty 3 files 
+
+### short term or for loop with touch in bash scripting
+
+```bash
+root@G580:~/test# touch file{1..40}
+root@G580:~/test# ls
+file1   file13  file17  file20  file24  file28  file31  file35  file39  file6
+file10  file14  file18  file21  file25  file29  file32  file36  file4   file7
+file11  file15  file19  file22  file26  file3   file33  file37  file40  file8
+file12  file16  file2   file23  file27  file30  file34  file38  file5   file9
+```
+
+#### Another Short Term
+
+```bash
+root@G580:~/test# mkdir file{1..40..5}
+root@G580:~/test# ls
+file1  file11  file16  file21  file26  file31  file36  file6
+```
+
+> this bash code it's adding old + new = filenumberX
+> 
+> ex file{15..300..15}
+> 
+> will be  
+> 
+> fiile(15+15)     => file30
+> 
+> file(30+15)      => file45
+> 
+> file(45+15)     => file60
+> 
+> and so on
+
+### demo
+
+```bash
+root@G580:~/test# touch file{15..300..15}
+root@G580:~/test# ls 
+file105  file135  file150  file180  file210  file240  file270  file30   file45  file75
+file120  file15   file165  file195  file225  file255  file285  file300  file60  file90
+```
+
+> When you touch new file based on the same name of old file  nothing will be happen but updating time scema "file info & data tiime & Creation time "
+
+
+
+# Day 4
+
+`Tree` It's command to show list directroy as tree 
+
+```bash
+root@G580:/var/log/mysql# tree
+.
+├── error.log
+├── error.log.1.gz
+├── nothing
+│   ├── nothing1
+│   ├── nothing2
+│   ├── nothing3
+│   ├── nothing4
+│   └── nothing5
+└── testing
+    ├── file1
+    ├── file2
+    ├── file3
+    ├── file4
+    └── file5
+
+2 directories, 12 files
+```
+
+`mkdir`  : Make Directory 
+
+```bash
+mkdir new_dir # make new dir called new_dir 
+mkdir newfile{1..4} # make new 4-directorys called new_dir1,new_dir2_newdir_3,new_dir4
+mkdir temp/dir # if temp not already directory exists will get error to fix this use -p 
+mkdir -p temp/dir/testing/nothing/
+```
+
+`cp`  : copy 
+
+```bash
+cp source desctnation
+cp /file/ /backup_file/
+# when trying to use cp with directorys like make backup from /etc/
+# use 
+cp -R /etc/ /backup/
+# if you wanna copy dir with special name 
+cp -r /etc/ /backup/new_etc
+```
+
+`cat` : reading text files
+
+```bash
+root@G580:~# cat msg 
+This is msg file and you can read me using cat msg :) .
+```
+
+`mv` it's `cp` but cp don't delete source
+
+```bash
+root@G580:~/labs# touch file{1..4}
+root@G580:~/labs# mkdir back_up
+root@G580:~/labs# tree
+.
+├── back_up
+├── file1
+├── file2
+├── file3
+└── file4
+1 directory, 4 files
+root@G580:~/labs# mv file* back_up/
+root@G580:~/labs# tree
+.
+└── back_up
+    ├── file1
+    ├── file2
+    ├── file3
+    └── file4
+1 directory, 4 files
+```
