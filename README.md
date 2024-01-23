@@ -118,9 +118,9 @@ Command Line Basics :
 
 * `root` takes 0-ID 
 
-* 1-999 They're for services ex apache have user called web and so on with another services like FTP , SMTP ...
+* 1-999 They're for services ex apache have user called web and so on with another services like FTP , SMTP and so on 
 
-`all users saved in  etc/passwd`
+* > all users saved in  etc/passwd
 
 * ```bash
   cat /etc/passwd
@@ -185,6 +185,8 @@ id username
 * `opt`      : optinal files you can remove it
 
 * `srv`      : optinal files like opt .  
+
+* `lib`      :  Library files like for <iostream> for c++ and so on with another lang 
 
 * `proc`    : called Virtual Filesystem and saved running services info + Hardware info 
   
