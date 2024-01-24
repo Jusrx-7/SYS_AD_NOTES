@@ -102,8 +102,6 @@
    chvt 5 # Change From TTY I in to TTY 5
    ```
 
-
-
 ### Linux File SYS Structure
 
 <img src="https://1.bp.blogspot.com/-UQ7-sWd_J4w/WmhKIFx7_fI/AAAAAAAAHIE/tixi5SsyI5YzoJygq_JQKL50axe2cAcrQCLcBGAs/s1600/Untitled.png" title="" alt="CD-ROM" width="763">
@@ -248,8 +246,6 @@ root@G580:~/labs# tree
 ---
 
 ## Day 5 : Basics Administration
-
-
 
 #### info :
 
@@ -509,4 +505,67 @@ total 12
 -rwxrwxr-x 1 root root    0 Jan 24 11:48 file1*
 ```
 
-## Day 6 :
+## Day 6 :  Redicetion
+
+### Descriptor
+
+| symbol | number |
+|:------:|:------:|
+| input  | 0      |
+| output | 1      |
+| error  | 2      |
+
+### output redirection
+
+```bash
+ls > ls_out # if ls_out not exists will be created and save output from ls
+ls askdbasd 2> ls_out # 2> for redirect errors
+*> == 1> *
+ls File dir_not_exits >resuilt 2>errors
+ls File dir_not_exits 2&>>all_Resuilt
+# when using > he overload file
+# but >> same old and add new 
+```
+
+### input
+
+```bash
+# defualt input is null 
+cat < file == cat file
+*reading and adding using cat*
+cat <<EOT>> new_file
+# new file 
+# adding new file 
+# anything new 
+# EOT
+# cat << ; for adding on old content not overloading 
+# EOT just text to tell bash when see EOT stop reading 
+# after stop reading will redirect using EOT>> new_file
+ cat <<addedby me >> file
+```
+
+> explaned this commands
+> 
+> 1. more : seeing file + auto close 
+> 
+> 2. less : seeing file + manual close
+> 
+> 3. | between 2 commands
+> 
+> 4. tee with ls & | 
+>    
+>    1.  ls | tee -a resuilt.txt     *-t for don't overloading*
+>       
+>       _this command will return resuilt into screen and save output into resuilt_
+> 
+> 5. w : whois login + some info 
+> 
+> 6. who : whois login into system and running 
+> 
+> 7. whoami or who am i 
+> 
+> 8. whatis {ls , pwd , chmod , chown}
+> 
+> 9. whereis {{ls , pwd , chmod , chown} return binary bath
+> 
+> 10. last 
