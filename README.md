@@ -8,15 +8,7 @@
 
 ## Day 1 : was Basics info & installation ;
 
-## Day 2 : Basics Commands ;
-
-
-
-```bash
-
-```
-
-## Day 3 : More Basics Commands ;
+## Day 2 & Day 3 :  Basics Commands ;
 
 ### Command Line Basics :
 
@@ -101,7 +93,7 @@
    eject /dev/sda # disconnect with sda drive 
    ```
 
-<img title="" src="https://upload.wikimedia.org/wikipedia/commons/7/70/Sony_CRX310S-Internal-PC-DVD-Drive-Opened.jpg" alt="CD-ROM" width="537" data-align="center">
+<img title="" src="https://upload.wikimedia.org/wikipedia/commons/7/70/Sony_CRX310S-Internal-PC-DVD-Drive-Opened.jpg" alt="CD-ROM" width="787" data-align="center">
 
 7. `TTY`'s and `chvt`
    
@@ -114,7 +106,7 @@
 
 ### Linux File SYS Structure
 
-![CD-ROM](https://1.bp.blogspot.com/-UQ7-sWd_J4w/WmhKIFx7_fI/AAAAAAAAHIE/tixi5SsyI5YzoJygq_JQKL50axe2cAcrQCLcBGAs/s1600/Untitled.png)
+<img src="https://1.bp.blogspot.com/-UQ7-sWd_J4w/WmhKIFx7_fI/AAAAAAAAHIE/tixi5SsyI5YzoJygq_JQKL50axe2cAcrQCLcBGAs/s1600/Untitled.png" title="" alt="CD-ROM" width="763">
 
 * `home`    : home Direcetory of any user will be created
 
@@ -256,6 +248,8 @@ root@G580:~/labs# tree
 ---
 
 ## Day 5 : Basics Administration
+
+
 
 #### info :
 
@@ -515,4 +509,4 @@ total 12
 -rwxrwxr-x 1 root root    0 Jan 24 11:48 file1*
 ```
 
-## Day 6 : Redirection
+## Day 6 :
