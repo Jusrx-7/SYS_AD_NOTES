@@ -554,7 +554,7 @@ cat <<EOT>> new_file
 > 
 > 4. tee with ls & | 
 >    
->    1.  ls | tee -a resuilt.txt     *-t for don't overloading*
+>    1. ls | tee -a resuilt.txt     *-t for don't overloading*
 >       
 >       _this command will return resuilt into screen and save output into resuilt_
 > 
@@ -569,3 +569,247 @@ cat <<EOT>> new_file
 > 9. whereis {{ls , pwd , chmod , chown} return binary bath
 > 
 > 10. last 
+
+---
+
+## Day 7 & Day 8
+
+> MBR <Master Boot Record>
+> 
+> Have 3 Spaces :
+> 
+> Partition Table __For Knowing The Start and The End of this partitions & disk__
+> 
+> **Partition Table is removed that's mean you hard Disk got formated**
+> 
+> **FILE SYSTEMs**  : `NTFS` , `EXT` , `ETX32` and so on see [There](en.wikipedia.org/wiki/File_system) For **More**
+> 
+> For Every Partition we have **Inode Table** and  it's normal table store info of anything will be stored in this partition 
+> 
+> 1 Parition Table it's store strart x to end y and Block number x+15 have data with permission RWX for user and RW for other and - - - For Group  and more info for any thing will be stored in this blcoks  "Metadata"
+> 
+> ---
+> 
+> Let's Collect this 
+> 
+> We have MBR and MBR Have Partition Table for Every Partition to know The Start And The End for this Partitions  and every Partition Table Have his own speically Inode Table And Inode Table have all informatoin in every Sector Or Block whatever in this space inside Partition 
+> 
+> ex : HHD = 400G 
+> 
+> 4 Partitions 
+> 
+> MBR Will store From 0 to 100 this partition 1 and so on for partition 4
+> 
+> and For Every PartitionX have Inode Table and this table Store all blocks From X to x+100
+> 
+> __If Inode Table To corrupted__ This Partition only got stoped and don't work anymore but if you formated it Kernel Will Create New Partition Table and send it to MBR and remove Corrupted __INODE TABLE__ and add new **INODE TABLE** 
+
+### Seeing Partition Table
+
+```bash
+$: fdisk -l /dev/sda
+Disk /dev/sda: 465.76 GiB, 500107862016 bytes, 976773168 sectors
+Disk model: ST500LT012-9WS14
+Units: sectors of 1 * 512 = 512 bytes
+Sector size (logical/physical): 512 bytes / 4096 bytes
+I/O size (minimum/optimal): 4096 bytes / 4096 bytes
+Disklabel type: gpt
+Disk identifier: B0CFC205-CDE7-47F1-9670-7F1A64BA0BB2
+
+Device         Start       End   Sectors   Size Type
+/dev/sda1       2048   9764863   9762816   4.7G EFI System
+/dev/sda2    9764864  19529727   9764864   4.7G BIOS boot
+/dev/sda3   19529728  39061503  19531776   9.3G Linux swap
+/dev/sda4   39061504 332029951 292968448 139.7G Linux filesystem
+/dev/sda5  332032000 490639359 158607360  75.6G Linux filesystem
+/dev/sda6  490639360 976773119 486133760 231.8G Microsoft basic data
+# fdisk -list device 
+return 
+    1. device or partition name "in Linux /dev/sdX"
+    2. Start and of this partition
+    3. Sector 
+    4. size this of all partition not what i used in this partition
+    5. File System Type     
+```
+
+### Seaing INODE-Number
+
+```bash
+$: ls -li 
+total 4
+131090 drwxr-xr-x 3 root root 4096 Jan 24 11:48 back_up
+# First Table is INODE-NUMBER and other we know what they are
+```
+
+> I-NODE != based on size of file  let's see what' i wanna tell You
+
+```bash
+$: df -hi 
+# df -human-readable  -inode-number 
+Filesystem     Inodes IUsed IFree IUse% Mounted on
+/dev/sda4        8.8M  439K  8.4M    5% /
+# now The I-Node in my / partition in /dev/sda4 
+# This Partition It's Size is 8.8M and i only used 439K of 8.8M 
+# so now only 439K used 95% of my space that's means 
+# inode number don't use every Block and gave this block his own inode number
+# no that mean you have large files and this files used space as well
+# and you have free inode ex you can add Large number of empty files or small files in system  
+$: df -h 
+/dev/sda4       137G  123G  7.1G  95% /
+```
+
+### Real DEMO
+
+```bash
+# Let's see First inode table on / whois in /dev/sda4
+$: df -i | grep "/dev/sda4"
+/dev/sda4      9158656 448903 8709753    5% /
+# we will use dd to write into file and make this files takes 2G
+$: dd if=/dev/zero of=testing.inode bs=1M count=2024 status=progress
+2090860544 bytes (2.1 GB, 1.9 GiB) copied, 19 s, 110 MB/s
+2024+0 records in
+2024+0 records out
+2122317824 bytes (2.1 GB, 2.0 GiB) copied, 23.2707 s, 91.2 MB/s
+# we write 2024MB into file called test.incode
+# let's see inode table new using df -i 
+$: df -i | grep "/dev/sda4"
+/dev/sda4      9158656 448904 8709752    5% /
+# look Here he used only 1 inode number to point to this file
+# The i-node Table don't care about size of file
+# he's only cares about number of files will use number of nodes 
+# for more info 
+$: touch file{1..50}
+$: df -i | grep "/dev/sda4"
+/dev/sda4      9158656 448954 8709702    5% /
+# from 448904 to 448954 that exactly number of files we got created them 
+# using touch and so on with every files and directory you working with them
+```
+
+### Soft Links & Hard Link
+
+---
+
+#### Soft Link
+
+>  soft link and hard link it's like shortcut in Windows 
+> 
+> 
+
+#### Demo :  Hard Link
+
+```bash
+------------------------------- Hard Link -------------------------------
+df -i | grep "/dev/sda4" # for seaing inode number before adding file
+/dev/sda4      9158656 446866 8711790    5% /
+$: touch file1
+$:  df -i | grep "/dev/sda4"
+/dev/sda4      9158656 446867 8711789    5% /
+# inode number from 446866 to 446867 that's mean we used inode number for file 
+$: ls -li # show i node number of file1 before hard linking  
+total 0
+131077 -rw-r--r-- 1 root root 0 Jan 25 12:03 file1
+$: ln file1 file2
+$: ls -li 
+total 0
+131077 -rw-r--r-- 2 root root 0 Jan 25 12:03 file1
+131077 -rw-r--r-- 2 root root 0 Jan 25 12:03 file2 
+# They Have The same inode number in "hard link"
+while rm -rf file1 , file2 still have access to this data why ?
+# while removing any file OS don't remove there data
+# it's only delete the falg on this inodes and set them as free 
+# so when we created 2 files point to the same file OS removed lable1 but still see lable2 on file2
+# when removing file2 data still in sys but can't access it 
+# someting like pointer in c++ when creaing new memory allocator you should delete it after done work    
+```
+
+#### Demo : Soft Link
+
+```bash
+------------------------------- Soft Link -------------------------------
+$: ln -s file1 file2 
+$: ll -i
+131077 -rw-r--r--  1 root root     10 Jan 25 12:10 fil1
+131085 lrwxrwxrwx  1 root root      4 Jan 25 12:14 file2 -> fil1
+# every file have how own inode number 
+# you can remove child links but when remove perant link child link don't know where they will go 
+$: rm -rf fil1  # will remove perant link so when open file2 
+$: cat file2 
+cat: file2: No such file or directory
+# while removing child link 
+$: ln -s main_soft child
+$: ll -i 
+total 140
+131084 drwxr-xr-x  2 root root 131072 Jan 25 12:22 ./
+131073 drwx------ 10 root root   4096 Jan 25 12:10 ../
+131085 lrwxrwxrwx  1 root root      9 Jan 25 12:22 child -> main_soft
+131077 -rw-r--r--  1 root root     11 Jan 25 12:21 main_soft
+# main_soft & child have diffrent inode number 
+$: echo "soft link" > main_soft
+$: ll -i main_soft child 
+131085 lrwxrwxrwx 1 root root  9 Jan 25 12:26 child -> main_soft
+131077 -rw-r--r-- 1 root root 10 Jan 25 12:24 main_soft
+$: cat child main_soft 
+soft link 
+soft link
+$: echo "adding comment" >> child 
+$: cat child main_soft 
+soft link
+adding comment
+soft link
+adding comment
+$: rm -rf child 
+$: ll -i main_soft child 
+ls: cannot access 'child': No such file or directory
+131077 -rw-r--r-- 1 root root 25 Jan 25 12:26 main_soft
+$: cat main_soft 
+soft link
+adding comment
+# still have main_soft content but child got removed
+```
+
+> bin and system bin are Soft link for /usr/bin
+
+```bash
+ll -i /
+total 157292
+      2 drwxr-xr-x  20 root root      4096 Jan 23 16:24 ./
+      2 drwxr-xr-x  20 root root      4096 Jan 23 16:24 ../
+     12 lrwxrwxrwx   1 root root         7 Dec 23 11:16 bin -> usr/bin/
+7340033 drwxr-xr-x   4 root root      4096 Dec 25 06:43 boot/
+2621441 drwxrwr-x   2 root root      4096 Dec 23 11:22 cdrom/
+   3010 -rw-------   1 root root 197763072 Dec 29 22:22 core.831
+      1 drwxr-xr-x  21 root root      5060 Jan 25 08:03 dev/
+ 786433 drwxr-xr-x 170 root root     12288 Jan 24 20:48 etc/
+2359297 drwxr-xr-x   3 root root      4096 Dec 23 11:23 home/
+     13 lrwxrwxrwx   1 root root         7 Dec 23 11:16 lib -> usr/lib/
+     14 lrwxrwxrwx   1 root root         9 Dec 23 11:16 lib32 -> usr/lib32/
+     15 lrwxrwxrwx   1 root root         9 Dec 23 11:16 lib64 -> usr/lib64/
+     16 lrwxrwxrwx   1 root root        10 Dec 23 11:16 libx32 -> usr/libx32/
+     11 drwx------   2 root root     16384 Dec 23 11:16 lost+found/
+6029313 drwxr-xr-x   3 root root      4096 Dec 23 11:31 media/
+1835009 drwxr-xr-x   3 root root      4096 Jan 19 23:45 mnt/
+6815745 drwxr-xr-x   3 root root      4096 Jan  6 09:36 opt/
+      1 dr-xr-xr-x 311 root root         0 Jan 25 08:02 proc/
+ 131073 drwx------  10 root root      4096 Jan 25 12:10 root/
+      1 drwxr-xr-x  43 root root      1200 Jan 25 11:41 run/
+     17 lrwxrwxrwx   1 root root         8 Dec 23 11:16 sbin -> usr/sbin/
+3407873 drwxr-xr-x  30 root root      4096 Jan 22 14:45 snap/
+ 262145 drwxr-xr-x   2 root root      4096 Aug  9  2022 srv/
+      1 dr-xr-xr-x  13 root root         0 Jan 25 08:02 sys/
+1048577 drwxrwxrwt  16 root root      4096 Jan 25 12:09 tmp/
+3538945 drwxr-xr-x  16 root root      4096 Dec 23 12:43 usr/
+1179649 drwxr-xr-x  15 root root      4096 Jan  3 21:12 var/
+--------------------------------------------------------------------------
+$: ll -i /lib
+13 lrwxrwxrwx 1 root root 7 Dec 23 11:16 /lib -> usr/lib/
+$: ll -i /usr/ | grep lib/
+3538949 drwxr-xr-x 131 root root  4096 Jan 20 21:18 lib/
+# /lib and /usr/lib are soft link
+# when remove /lib whois under / nothing gonna happen .  
+```
+
+> - hard link not working with directorys but soft works 
+> 
+> - ln mydir/ hardlink != ls -s mydir/ softlink 
+> 
+> - *while using soft link* you should use absolute path
