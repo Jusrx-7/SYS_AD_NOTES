@@ -582,7 +582,7 @@ cat <<EOT>> new_file
 > 
 > **Partition Table is removed that's mean you hard Disk got formated**
 > 
-> **FILE SYSTEMs**  : `NTFS` , `EXT` , `ETX32` and so on see [There](en.wikipedia.org/wiki/File_system) For **More**
+> **FILE SYSTEMs**  : `NTFS` , `EXT` , `ETX32` and so on see [There](https://en.wikipedia.org/wiki/File_system) For **More**
 > 
 > For Every Partition we have **Inode Table** and  it's normal table store info of anything will be stored in this partition 
 > 
