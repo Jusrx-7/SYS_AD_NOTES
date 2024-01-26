@@ -627,7 +627,7 @@ Device         Start       End   Sectors   Size Type
 return 
     1. device or partition name "in Linux /dev/sdX"
     2. Start and of this partition
-    3. Sector 
+    3. Sector = Hard SIze / sector size = how many block you have you will use it with LVM 
     4. size this of all partition not what i used in this partition
     5. File System Type     
 ```
@@ -692,8 +692,6 @@ $: df -i | grep "/dev/sda4"
 #### Soft Link
 
 >  soft link and hard link it's like shortcut in Windows 
-> 
-> 
 
 #### Demo :  Hard Link
 
@@ -813,3 +811,171 @@ $: ll -i /usr/ | grep lib/
 > - ln mydir/ hardlink != ls -s mydir/ softlink 
 > 
 > - *while using soft link* you should use absolute path
+
+---
+
+## Day 9
+
+### Showing Disks
+
+```bash
+$: lsblk <list-Block>
+NAME            MAJ:MIN RM  SIZE RO TYPE MOUNTPOINT
+sda               8:0    0    8G  0 disk 
+├─sda1            8:1    0    1G  0 part /boot
+└─sda2            8:2    0    7G  0 part 
+  ├─centos-root 253:0    0  6.2G  0 lvm  /
+  └─centos-swap 253:1    0  820M  0 lvm  [SWAP]
+sdb               8:16   0   20G  0 disk 
+└─sdb1            8:17   0   10G  0 part 
+sdc               8:32   0   15G  0 disk 
+sdd               8:48   0   10G  0 disk 
+sr0              11:0    1 1024M  0 rom  
+# for Showing Special file use fdisk -l 
+# fdisk used for showing disks and mange disks 
+$: fdisk -l /dev/sdb # Showing Disk Description
+Disk /dev/sdb: 21.5 GB, 21474836480 bytes, 41943040 sectors
+Units = sectors of 1 * 512 = 512 bytes
+Sector size (logical/physical): 512 bytes / 512 bytes
+I/O size (minimum/optimal): 512 bytes / 512 bytes
+Disk label type: dos
+Disk identifier: 0xbf56859a
+   Device Boot      Start         End      Blocks   Id  System
+$: fdisk /dev/sdb # Editing Disk
+Welcome to fdisk (util-linux 2.23.2).
+
+Changes will remain in memory only, until you decide to write them.
+Be careful before using the write command.
+
+
+Command (m for help): m
+Command action
+   a   toggle a bootable flag
+   b   edit bsd disklabel
+   c   toggle the dos compatibility flag
+   d   delete a partition
+   g   create a new empty GPT partition table
+   G   create an IRIX (SGI) partition table
+   l   list known partition types
+   m   print this menu
+   n   add a new partition
+   o   create a new empty DOS partition table
+   p   print the partition table
+   q   quit without saving changes
+   s   create a new empty Sun disklabel
+   t   change a partition's system id
+   u   change display/entry units
+   v   verify the partition table
+   w   write table to disk and exit
+   x   extra functionality (experts only)
+Command (m for help):
+```
+
+__After Booting kernel don't re-scan Automatic we should tell Kernel Got To MBR and Re-Scan Partition Table__ we will use `partprobe`
+
+### Creating File System
+
+```bash
+mkfs.ext4 /dev/sdb1
+mke2fs 1.42.9 (28-Dec-2013)
+Filesystem label=
+OS type: Linux
+Block size=4096 (log=2)
+Fragment size=4096 (log=2)
+Stride=0 blocks, Stripe width=0 blocks
+983040 inodes, 3932160 blocks
+196608 blocks (5.00%) reserved for the super user
+First data block=0
+Maximum filesystem blocks=2151677952
+120 block groups
+32768 blocks per group, 32768 fragments per group
+8192 inodes per group
+Superblock backups stored on blocks: 
+    32768, 98304, 163840, 229376, 294912, 819200, 884736, 1605632, 2654208
+
+Allocating group tables: done                            
+Writing inode tables: done                            
+Creating journal (32768 blocks): done
+Writing superblocks and filesystem accounting information: done   
+```
+
+### Formating Disk
+
+```bash
+cat /dev/random >> /dev/sdX 
+# if you used it with patition ex /dev/sda3 that's mean you want to delete inode table not partition table
+# using dd
+dd if=/dev/sdX of=dev/sdX bs=512B count=1 status=progress 
+dd : disk distory
+if : input File
+of : output File
+bs : Block SIze 
+count : how many Times You Wanna Me Write this Block SIze 
+status : show me what you do 
+```
+
+### Check Disk using `e2fsck`
+
+```bash
+# you should use it with un mounted partitions 
+use df -h or lsblk
+$: df -h 
+Filesystem               Size  Used Avail Use% Mounted on
+devtmpfs                 232M     0  232M   0% /dev
+tmpfs                    244M     0  244M   0% /dev/shm
+tmpfs                    244M  4.6M  239M   2% /run
+tmpfs                    244M     0  244M   0% /sys/fs/cgroup
+/dev/mapper/centos-root  6.2G  1.5G  4.8G  23% /
+/dev/sda1               1014M  137M  878M  14% /boot
+tmpfs                     49M     0   49M   0% /run/user/0
+$: lsblk 
+NAME            MAJ:MIN RM  SIZE RO TYPE MOUNTPOINT
+sda               8:0    0    8G  0 disk 
+├─sda1            8:1    0    1G  0 part /boot
+└─sda2            8:2    0    7G  0 part 
+  ├─centos-root 253:0    0  6.2G  0 lvm  /
+  └─centos-swap 253:1    0  820M  0 lvm  [SWAP]
+sdb               8:16   0   20G  0 disk 
+└─sdb1            8:17   0    5G  0 part 
+sdc               8:32   0   15G  0 disk 
+sdd               8:48   0   10G  0 disk 
+sr0              11:0    1 1024M  0 rom  
+we focus on sdb1
+$: df -h | grep "sdb" & lsblk | grep "sdb" 
+sdb               8:16   0   20G  0 disk 
+└─sdb1            8:17   0    5G  0 part 
+# now we can check *we check partitions not hard
+# you should take backup first 
+# backup using dd 
+dd if=/devv/sdbX of=/backup
+# checking
+e2fsck -f /dev/sdb1
+e2fsck 1.42.9 (28-Dec-2013)
+Pass 1: Checking inodes, blocks, and sizes
+Pass 2: Checking directory structure
+Pass 3: Checking directory connectivity
+Pass 4: Checking reference counts
+Pass 5: Checking group summary information
+/dev/sdb1: 11/327680 files (0.0% non-contiguous), 58462/1310720 blocks
+```
+
+##### e2fsck it's not scan data it's scan Inode table and restore the "super Block" who's created while using mkfs
+
+#### Notes
+
+##### While using dd with /dev/random or urandom != /dev/zero in `size`
+
+```bash
+$: dd if=/dev/zero of=/dev/sdb bs=512 count=1
+1+0 records in
+1+0 records out
+512 bytes (512 B) copied, 0.00193723 s, 264 kB/s
+$: dd if=/dev/random of=/dev/sdb bs=512 count=1
+0+1 records in
+0+1 records out
+11 bytes  (11 B)  copied, 0.00128421 s, 8.6 kB/s
+UTF-8 != ANSI
+  512 != 11 
+```
+
+---
