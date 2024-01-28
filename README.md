@@ -979,3 +979,247 @@ UTF-8 != ANSI
 ```
 
 ---
+
+## Day 10
+
+### Mounting
+
+```bash
+$: mount <device> <end-point>
+   mount /dev/sdb1 /mnt/sdb1 
+# MAX Size /mnt/sdb1 can use it's based on partition Size of /dev/sdb1 
+```
+
+### umount
+
+```bash
+umount /dev/sdb3 /media or umount /data
+```
+
+### mount -t
+
+#### in the past with RHEL under 5
+
+> you was should set file system type but now he's doing this without you "auto detect"
+
+```bash
+# use lsblk -f for showing file system then mount this file system
+$: lsblk -f
+NAME            FSTYPE      LABEL UUID                                   MOUNTPOINT
+sda                                                                      
+├─sda1          xfs               2f3759f6-7f31-44e4-bffb-6a27fc0a21bd   /boot
+└─sda2          LVM2_member       aZyEsw-cvzc-YZIv-xZqV-LBzB-2nsx-esjTvQ 
+  ├─centos-root xfs               2fe2f1bd-99c6-4e64-a59b-5a3c6423f9ee   /
+  └─centos-swap swap              77b75f33-184e-4078-b6c3-63e423245f59   [SWAP]
+sdb                                                                      
+├─sdb1                                                                   
+├─sdb2          ext4              25883b61-9fac-4bc8-946e-38af8bf1c020   /mnt/sdb2
+├─sdb3          btrfs             3c16addf-c7bf-4f4b-a472-4db7f71886f5   
+└─sdb5          xfs               7919a387-4d5f-4a68-a52d-a10eee8524d5   
+sdc                                                                      
+sdd                                                                      
+sr0                                                                      
+$: mount -t ext4 /dev/sdb2 /data
+# if you trying to gave him not real file system he's will think you have bad file system and will tell you you should check logs using dmesg
+$: dmesg
+EXT4-fs (sdb2): mounted filesystem with ordered data mode. Opts: (null)
+[ 1768.158115] EXT4-fs (sdb3): VFS: Can't find ext4 filesystem
+```
+
+### Fixing Mounting Bugs
+
+__While replacing From Port to another Port Kernel will read new disk called sdbc not sdb so we will fix this using UUID or LableNAME__
+
+```bash
+$: lsblk 
+NAME            MAJ:MIN RM  SIZE RO TYPE MOUNTPOINT
+sda               8:0    0    8G  0 disk 
+├─sda1            8:1    0    1G  0 part /boot
+└─sda2            8:2    0    7G  0 part 
+  ├─centos-root 253:0    0  6.2G  0 lvm  /
+  └─centos-swap 253:1    0  820M  0 lvm  [SWAP]
+sdb               8:16   0   20G  0 disk 
+├─sdb1            8:17   0    1K  0 part 
+├─sdb2            8:18   0    5G  0 part 
+├─sdb3            8:19   0    5G  0 part 
+└─sdb5            8:21   0    5G  0 part 
+sdc               8:32   0   15G  0 disk 
+sdd               8:48   0   10G  0 disk 
+sr0              11:0    1 1024M  0 rom  
+# we will focus on sdb5 we will need to find his UUID 
+$: blkid
+/dev/sda1: UUID="2f3759f6-7f31-44e4-bffb-6a27fc0a21bd" TYPE="xfs" 
+/dev/sda2: UUID="aZyEsw-cvzc-YZIv-xZqV-LBzB-2nsx-esjTvQ" TYPE="LVM2_member" 
+/dev/sdb2: UUID="25883b61-9fac-4bc8-946e-38af8bf1c020" TYPE="ext4" 
+/dev/sdb3: UUID="3c16addf-c7bf-4f4b-a472-4db7f71886f5" UUID_SUB="879762a6-2602-4f0e-805b-d87d3b72d475" TYPE="btrfs" 
+/dev/sdb5: UUID="7919a387-4d5f-4a68-a52d-a10eee8524d5" TYPE="xfs" 
+/dev/mapper/centos-root: UUID="2fe2f1bd-99c6-4e64-a59b-5a3c6423f9ee" TYPE="xfs" 
+/dev/mapper/centos-swap: UUID="77b75f33-184e-4078-b6c3-63e423245f59" TYPE="swap" 
+# sdb5 UUID is : 7919a387-4d5f-4a68-a52d-a10eee8524d5
+# adding lable name for /dev/sdb5 
+e2label /dev/sdb5 oracel_db
+```
+
+#### For Mouting Using UUID
+
+```bash
+mount -U 7919a387-4d5f-4a68-a52d-a10eee8524d5 /media 
+or 
+mount uuid=7919a387-4d5f-4a68-a52d-a10eee8524d5 /media
+# From mount help :  
+$: mount --help | grep UUID
+ -U, --uuid <uuid>       synonym for UUID=<uuid>
+ UUID=<uuid>             specifies device by filesystem UUID
+ PARTUUID=<uuid>         specifies device by partition UUID
+# unmount 
+lsblk | grep sdb 
+sdb               8:16   0   20G  0 disk 
+├─sdb1            8:17   0    1K  0 part 
+├─sdb2            8:18   0    5G  0 part 
+├─sdb3            8:19   0    5G  0 part 
+└─sdb5            8:21   0    5G  0 part /media
+[root@localhost ~]# umount  /media/
+[root@localhost ~]# lsblk | grep sdb 
+sdb               8:16   0   20G  0 disk 
+├─sdb1            8:17   0    1K  0 part 
+├─sdb2            8:18   0    5G  0 part 
+├─sdb3            8:19   0    5G  0 part 
+└─sdb5            8:21   0    5G  0 part 
+```
+
+### Adding Mounts into /etc/fstab
+
+```bash
+vim /etc/fstab
+<dev> <end-point> <file system Type> <mount options> <dump order> <file system check order>
+device : /dev/sdb3
+endpoint : /media
+type : ext4 or ext3 or xfs and so on 
+mount options : read write (rw) , read only (ro) , executable (exec) , no executable (noexec) 
+with noexec means don\'t run any binary files 
+file sys check : o => 9
+0 means don\'t do any check 1->9 means who\'s will be check first
+ like if set 6 , partition number 6 have high privilege to be check fisrt than any partition else in the same disk 
+dump older : 1 -> 9  For Backup while booting same like file system check 
+/dev/sdb3 /media ext4 rw,ro,noexec,exec, 0->9 , 0->9
+```
+
+- when you edit fstab should after done edititng mount -a before reboot or shutdown
+
+#### /etc/mtab
+
+- have copy any thing have been mounted
+
+```bash
+$: lsblk /dev/sdb -f
+NAME   FSTYPE LABEL UUID                                 MOUNTPOINT
+sdb                                                      
+├─sdb1                                                   
+├─sdb2 ext4         25883b61-9fac-4bc8-946e-38af8bf1c020 
+├─sdb3 btrfs        3c16addf-c7bf-4f4b-a472-4db7f71886f5 
+└─sdb5 xfs          7919a387-4d5f-4a68-a52d-a10eee8524d5 
+$: mount /dev/sdb2 /media/
+$: tail -n 1 /etc/mtab 
+/dev/sdb2 /media ext4 rw,seclabel,relatime,data=ordered 0 0
+# you can copy this file and add it into /etc/fstab if you don't know syntax of fstab
+$: cat /etc/fstab 
+/dev/mapper/centos-root /                       xfs     defaults        0 0
+UUID=2f3759f6-7f31-44e4-bffb-6a27fc0a21bd /boot                   xfs     defaults        0 0
+/dev/mapper/centos-swap swap                    swap    defaults        0 0
+$: tail -n 1 /etc/mtab >> /etc/fstab 
+$: cat /etc/fstab 
+/dev/mapper/centos-root /                       xfs     defaults        0 0
+UUID=2f3759f6-7f31-44e4-bffb-6a27fc0a21bd /boot                   xfs     defaults        0 0
+/dev/mapper/centos-swap swap                    swap    defaults        0 0
+/dev/sdb2 /media ext4 rw,seclabel,relatime,data=ordered 0 0
+[root@localhost ~]# 
+```
+
+## Compressing & Archive
+
+### gzip VS bzip2
+
+| name  | Compresstion Time | Extracting Time | ending size |
+| ----- | ----------------- | --------------- | ----------- |
+| bzip2 | Slow              | Slow            | smaller     |
+| gzip  | Fast              | Fast            | bigger      |
+
+#### *Compresstion VS Archiving*
+
+#### Archiving : *means you Collect more then one files or dirctory in one file for fast Tranfer between 2 devices*
+
+#### Compression : *means you wanna get small size of many files or directorys*
+
+#### *Compressing don't works with imgs and videos*
+
+### Demo :
+
+```bash
+# Creating big file for testing
+$: ll -R / > file 2>/dev/null &
+# show file size using du -sh 
+$: du -sh file # or use ls -lah or ll -h 
+89M    file
+# Showing Time gzip will take while archiving
+$: time gzip file 
+real    0m1.544s
+user    0m1.492s
+sys    0m0.052s
+$: time gunzip file.gz  
+real    0m0.540s
+user    0m0.393s
+sys    0m0.060s
+# now gzip takes 1.5 of extracting and .5
+-------------------------------------------------------------
+# Let's show bzip2
+$: time bzip2 file 
+real    0m15.277s
+user    0m13.062s
+sys    0m0.097s
+$: time bunzip2 file.bz2 
+real    0m2.430s
+user    0m2.299s
+sys    0m0.104s
+# bzip2 archiving = 15 & extracting = 2.4
+
+so Compresstion of : gzip / bzip2 = 1.5/15 & extracting = 2.4/.5
+Size :
+-rw-r--r-- 1 root root 9.2M Jan 28 10:22 file.gz 
+-rw-r--r-- 1 root root 6.3M Jan 28 10:22 file.bz2
+```
+
+### Archiving using tar
+
+```bash
+tar cfv back_etc.tar /etc 
+c : create 
+f : file 
+v : virbose 
+# Showing Size of Both
+$: du -sh /etc/ && ll -h file.bz2 
+19M	/etc/
+-rw-r--r-- 1 root root 6.3M Jan 28 10:22 file.bz2
+# Time 
+$: time tar cfv back_etc.tar /etc/
+real	0m0.199s
+user	0m0.036s
+sys	0m0.064s
+$: time tar xfv back_etc.tar
+real	0m0.236s
+user	0m0.028s
+sys	0m0.192s
+```
+
+### tar with gzip and bzip
+
+#### __I see tar faster then gzip and bzip2__
+
+#### but i video tar was slower then both but i don't know how
+
+#### tar + gzip : tar cfvz file.tar.gz  file
+
+#### tar  + bzip : tar cfvj file.tar.bz2 file
+
+#### extracting tar xvf{z,j} file.tar.{gz,bz2}
+
+#### For Showing The Content use tar tvf{g,j} file.tar.{gz,bz2}
