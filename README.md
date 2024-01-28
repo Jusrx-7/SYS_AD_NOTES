@@ -1227,3 +1227,236 @@ sys    0m0.192s
 #### For Showing The Content use tar tvf{g,j} file.tar.{gz,bz2}
 
 ---
+
+## Day 11
+
+### - Process Mangement Basics
+
+### Process' are 2 kind
+
+1. child
+
+2. perant
+
+#### Any Process as Perant as itself , can Creat Threads so Threads called Child of Main Process
+
+- Main Process Called PID <process ID> or <Perant ID> doesn't mater ;
+
+any Linux Destro First PID is one of { "init" , "systemd" }
+
+### ps
+
+```bash
+$: ps # return corrunt process from this terminal only
+    PID TTY          TIME CMD
+   7469 pts/2    00:00:00 bash
+   7517 pts/2    00:00:00 ps
+$: ps a # return all process from all any terminal for this user
+# open terminal and run sleep 1555
+sleep 1555 
+# in another terminal use ps a to see sleep process
+$: ps a 
+    PID TTY      STAT   TIME COMMAND
+   1185 tty7     Ssl+   3:28 /usr/lib/xorg/Xorg -core :0 -seat seat0 -auth /var/run/lightdm/root/:0 -
+   1187 tty1     Ss+    0:00 /sbin/agetty -o -p -- \u --noclear tty1 linux
+   3060 pts/0    Ss     0:00 bash
+   7469 pts/2    Ss     0:00 bash
+   7528 pts/0    S+     0:00 sleep 1555
+   7531 pts/2    R+     0:00 ps a
+```
+
+#### ps aux
+
+```bash
+$: ps aux  # return : 
+USER  PID %CPU %MEM  VSZ   RSS TTY  STAT START TIME COMMAND
+```
+
+#### pgrep
+
+```bash
+pgrep <process name>
+```
+
+#### pkill
+
+```bash
+pkill <process name>
+```
+
+#### pstree
+
+```bash
+$: pstree
+systemd─┬─ModemManager───2*[{ModemManager}]
+        ├─NetworkManager───2*[{NetworkManager}]
+        ├─accounts-daemon───2*[{accounts-daemon}]
+        ├─acpid
+        ├─agetty
+        ├─apache2───5*[apache2]
+        ├─avahi-daemon───avahi-daemon
+        ├─colord───2*[{colord}]
+        ├─cron
+        ├─cups-browsed───2*[{cups-browsed}]
+        ├─cupsd
+        ├─dbus-daemon
+        ├─gnome-keyring-d─┬─ssh-agent
+        │                 └─3*[{gnome-keyring-d}]
+        ├─irqbalance───{irqbalance}
+        ├─2*[kerneloops]
+        ├─lightdm─┬─Xorg───4*[{Xorg}]
+        │         ├─lightdm─┬─xfce4-session─┬─Thunar───2*[{Thunar}]
+        │         │         │               ├─agent───2*[{agent}]
+        │         │         │               ├─applet.py
+        │         │         │               ├─ayatana-indicat───2*[{ayatana-indicat}]
+        │         │         │               ├─blueman-applet───3*[{blueman-applet}]
+        │         │         │               ├─nm-applet───3*[{nm-applet}]
+        │         │         │               ├─polkit-gnome-au───2*[{polkit-gnome-au}]
+        │         │         │               ├─update-notifier───3*[{update-notifier}]
+        │         │         │               ├─xfce4-panel─┬─panel-1-whisker─┬─firefox─┬─2*[Isolated +
+        │         │         │               │             │                 │         ├─4*[Isolated +
+        │         │         │               │             │                 │         ├─Privileged C+
+        │         │         │               │             │                 │         ├─RDD Process─+++
+        │         │         │               │             │                 │         ├─Socket Proce+
+        │         │         │               │             │                 │         ├─Utility Proc+
+        │         │         │               │             │                 │         ├─3*[Web Conte+
+        │         │         │               │             │                 │         ├─WebExtension+
+        │         │         │               │             │                 │         └─118*[{firefo+
+        │         │         │               │             │                 ├─marktext─┬─marktext───+
+        │         │         │               │             │                 │          ├─marktext
+        │         │         │               │             │                 │          ├─marktext───+
+        │         │         │               │             │                 │          ├─marktext───+
+        │         │         │               │             │                 │          └─31*[{markte+
+        │         │         │               │             │                 └─2*[{panel-1-whisker}]
+        │         │         │               │             ├─panel-5-systray───2*[{panel-5-systray}]
+        │         │         │               │             ├─panel-6-notific───2*[{panel-6-notific}]
+        │         │         │               │             ├─panel-7-indicat───2*[{panel-7-indicat}]
+        │         │         │               │             ├─panel-8-power-m───2*[{panel-8-power-m}]
+        │         │         │               │             ├─panel-9-pulseau───2*[{panel-9-pulseau}]
+        │         │         │               │             └─2*[{xfce4-panel}]
+        │         │         │               ├─xfce4-power-man───2*[{xfce4-power-man}]
+        │         │         │               ├─xfdesktop───2*[{xfdesktop}]
+        │         │         │               ├─xfsettingsd───2*[{xfsettingsd}]
+        │         │         │               ├─xfwm4───3*[{xfwm4}]
+        │         │         │               ├─xiccd───2*[{xiccd}]
+        │         │         │               └─2*[{xfce4-session}]
+        │         │         └─2*[{lightdm}]
+        │         └─2*[{lightdm}]
+        ├─mysqld───36*[{mysqld}]
+        ├─networkd-dispat
+        ├─polkitd───2*[{polkitd}]
+        ├─rpcbind
+        ├─rsyslogd───3*[{rsyslogd}]
+        ├─rtkit-daemon───2*[{rtkit-daemon}]
+        ├─smartd
+        ├─snapd───10*[{snapd}]
+        ├─sshd
+        ├─systemd─┬─(sd-pam)
+        │         ├─at-spi-bus-laun─┬─dbus-daemon
+        │         │                 └─3*[{at-spi-bus-laun}]
+        │         ├─at-spi2-registr───2*[{at-spi2-registr}]
+        │         ├─dbus-daemon
+        │         ├─dconf-service───2*[{dconf-service}]
+        │         ├─gvfs-afc-volume───3*[{gvfs-afc-volume}]
+        │         ├─gvfs-goa-volume───2*[{gvfs-goa-volume}]
+        │         ├─gvfs-gphoto2-vo───2*[{gvfs-gphoto2-vo}]
+        │         ├─gvfs-mtp-volume───2*[{gvfs-mtp-volume}]
+        │         ├─gvfs-udisks2-vo───3*[{gvfs-udisks2-vo}]
+        │         ├─gvfsd─┬─gvfsd-dnssd───2*[{gvfsd-dnssd}]
+        │         │       ├─gvfsd-network───3*[{gvfsd-network}]
+        │         │       ├─gvfsd-recent───2*[{gvfsd-recent}]
+        │         │       ├─gvfsd-trash───2*[{gvfsd-trash}]
+        │         │       └─2*[{gvfsd}]
+        │         ├─gvfsd-fuse───5*[{gvfsd-fuse}]
+        │         ├─gvfsd-metadata───2*[{gvfsd-metadata}]
+        │         ├─obexd
+        │         ├─pipewire───{pipewire}
+        │         ├─pipewire-media-───{pipewire-media-}
+        │         ├─pulseaudio───3*[{pulseaudio}]
+        │         ├─snap───8*[{snap}]
+        │         ├─xdg-desktop-por───4*[{xdg-desktop-por}]
+        │         ├─xdg-desktop-por───3*[{xdg-desktop-por}]
+        │         ├─xdg-document-po─┬─fusermount3
+        │         │                 └─5*[{xdg-document-po}]
+        │         ├─xdg-permission-───2*[{xdg-permission-}]
+        │         ├─xfce4-notifyd───2*[{xfce4-notifyd}]
+        │         ├─xfce4-screensav───2*[{xfce4-screensav}]
+        │         └─xfconfd───2*[{xfconfd}]
+        ├─systemd-journal
+        ├─systemd-logind
+        ├─systemd-resolve
+        ├─systemd-timesyn───{systemd-timesyn}
+        ├─systemd-udevd
+        ├─thermald───{thermald}
+        ├─tor───4*[{tor}]
+        ├─udisksd───4*[{udisksd}]
+        ├─unattended-upgr───{unattended-upgr}
+        ├─upowerd───2*[{upowerd}]
+        ├─vlc───22*[{vlc}]
+        ├─wpa_supplicant
+        └─xfce4-terminal─┬─bash───pstree
+                         ├─bash
+                         └─2*[{xfce4-terminal}]
+
+```
+
+### kill
+
+- to kill process 
+
+```bash
+kill PID
+kill -9 PID # -9 for force kill 
+$: kill -l  
+ 1) SIGHUP	 2) SIGINT	 3) SIGQUIT	 4) SIGILL	 5) SIGTRAP
+ 6) SIGABRT	 7) SIGBUS	 8) SIGFPE	 9) SIGKILL	10) SIGUSR1
+11) SIGSEGV	12) SIGUSR2	13) SIGPIPE	14) SIGALRM	15) SIGTERM
+16) SIGSTKFLT	17) SIGCHLD	18) SIGCONT	19) SIGSTOP	20) SIGTSTP
+21) SIGTTIN	22) SIGTTOU	23) SIGURG	24) SIGXCPU	25) SIGXFSZ
+26) SIGVTALRM	27) SIGPROF	28) SIGWINCH	29) SIGIO	30) SIGPWR
+31) SIGSYS	34) SIGRTMIN	35) SIGRTMIN+1	36) SIGRTMIN+2	37) SIGRTMIN+3
+38) SIGRTMIN+4	39) SIGRTMIN+5	40) SIGRTMIN+6	41) SIGRTMIN+7	42) SIGRTMIN+8
+43) SIGRTMIN+9	44) SIGRTMIN+10	45) SIGRTMIN+11	46) SIGRTMIN+12	47) SIGRTMIN+13
+48) SIGRTMIN+14	49) SIGRTMIN+15	50) SIGRTMAX-14	51) SIGRTMAX-13	52) SIGRTMAX-12
+53) SIGRTMAX-11	54) SIGRTMAX-10	55) SIGRTMAX-9	56) SIGRTMAX-8	57) SIGRTMAX-7
+58) SIGRTMAX-6	59) SIGRTMAX-5	60) SIGRTMAX-4	61) SIGRTMAX-3	62) SIGRTMAX-2
+63) SIGRTMAX-1	64) SIGRTMAX	
+# this signals to work with any process and kill signals
+```
+
+- pkill <Process name> 
+
+```bash
+pkill firefox
+```
+
+### Background process
+
+```bash
+<process command> & 
+firefox &
+# but error will be displayed into your terminal 
+# we will use redirection for fix this 
+firefox & 2>/dev/null
+```
+
+#### CTRL+Z : means pause process not terminate it use `fg` for continue , CTRL+C : means kill it `kill -15`
+
+```bash
+jobs # will return process who's runs in background for you not for all users
+firefox &
+[1] 8848
+$: jobs
+[1]+  Running                 firefox &
+$: fg %1 # if have more than one process in background 
+# you can use number or name like 
+$: fg "%firefox" 
+firefox
+pwd
+ls
+help
+_:( # if i trying to do anything I can't
+ 
+```
+
+---
