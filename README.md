@@ -990,13 +990,13 @@ $: mount <device> <end-point>
 # MAX Size /mnt/sdb1 can use it's based on partition Size of /dev/sdb1 
 ```
 
-### umount
+#### umount
 
 ```bash
 umount /dev/sdb3 /media or umount /data
 ```
 
-### mount -t
+#### mount -t
 
 #### in the past with RHEL under 5
 
@@ -1060,7 +1060,7 @@ $: blkid
 e2label /dev/sdb5 oracel_db
 ```
 
-#### For Mouting Using UUID
+##### For Mouting Using UUID
 
 ```bash
 mount -U 7919a387-4d5f-4a68-a52d-a10eee8524d5 /media 
@@ -1135,7 +1135,9 @@ UUID=2f3759f6-7f31-44e4-bffb-6a27fc0a21bd /boot                   xfs     defaul
 [root@localhost ~]# 
 ```
 
-## Compressing & Archive
+---
+
+### Compressing & Archive
 
 ### gzip VS bzip2
 
@@ -1197,17 +1199,17 @@ f : file
 v : virbose 
 # Showing Size of Both
 $: du -sh /etc/ && ll -h file.bz2 
-19M	/etc/
+19M    /etc/
 -rw-r--r-- 1 root root 6.3M Jan 28 10:22 file.bz2
 # Time 
 $: time tar cfv back_etc.tar /etc/
-real	0m0.199s
-user	0m0.036s
-sys	0m0.064s
+real    0m0.199s
+user    0m0.036s
+sys    0m0.064s
 $: time tar xfv back_etc.tar
-real	0m0.236s
-user	0m0.028s
-sys	0m0.192s
+real    0m0.236s
+user    0m0.028s
+sys    0m0.192s
 ```
 
 ### tar with gzip and bzip
@@ -1223,3 +1225,5 @@ sys	0m0.192s
 #### extracting tar xvf{z,j} file.tar.{gz,bz2}
 
 #### For Showing The Content use tar tvf{g,j} file.tar.{gz,bz2}
+
+---
