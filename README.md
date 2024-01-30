@@ -1480,4 +1480,47 @@ $process  = pgrep mysql
 renice -n -20 $process # to get mysql process id
 ```
 
-# 
+---
+
+## Day 13
+
+### Searching With Files or Commands __Directorys in the end it's files__
+
+```bash
+# Search on files using locate or find
+locate network # located based on DB
+# updating locateDB 
+updatedb
+# find real time searching 
+find . --option find_param
+find /etc/ --iname network
+-iname = -name + in-sensitive
+# sea man for more info of powerful of finding files with find 
+```
+
+### grep
+
+```bash
+grep key_word FILE_PATH
+grep root /etc/passwd
+grep -i : in-sinsitive
+grep -v : verse or reversed or anything and execlude what i will gave you
+grep -v root /etc/passwd # return all resuilt and execlude root from this folder
+grep -vi root /etc/passwd # for removeing output have and test called root 
+grep -n : # return this keyword in line number X 
+grep -n root /etc/passwd
+1:root:x:0:0:root:/root:/bin/bash
+48:nm-openvpn:x:129:134:NetworkManager OpenVPN,,,:/var/lib/openvpn/chroot:/usr/sbin/nologin 
+grep -R : # search inside directory have more then one file
+--------------------------------------------------------------------------
+$: grep -inR listen /etc/apache2/
+/etc/apache2/apache2.conf:36:#   supposed to determine listening ports for incoming connections which can be
+/etc/apache2/apache2.conf:149:# Include list of ports to listen on
+/etc/apache2/ports.conf:5:Listen 80
+/etc/apache2/ports.conf:8:	Listen 443
+/etc/apache2/ports.conf:12:	Listen 443
+$: grep -inlR listen /etc/apache2/ # -l return files without content
+/etc/apache2/apache2.conf
+/etc/apache2/ports.conf
+
+```
