@@ -1517,10 +1517,333 @@ $: grep -inR listen /etc/apache2/
 /etc/apache2/apache2.conf:36:#   supposed to determine listening ports for incoming connections which can be
 /etc/apache2/apache2.conf:149:# Include list of ports to listen on
 /etc/apache2/ports.conf:5:Listen 80
-/etc/apache2/ports.conf:8:	Listen 443
-/etc/apache2/ports.conf:12:	Listen 443
+/etc/apache2/ports.conf:8:    Listen 443
+/etc/apache2/ports.conf:12:    Listen 443
 $: grep -inlR listen /etc/apache2/ # -l return files without content
 /etc/apache2/apache2.conf
 /etc/apache2/ports.conf
-
 ```
+
+### VIM-Edito
+
+> #### vim it's upgraded version of vi
+
+```bash
+# comman Mode => Insert Mode Then Click esc to Get Return to comman Mode & from Comman Mode to Exec mode Click ":"
+# in exec mode have 3 type or dalling with files
+# 1 => w , Write 
+# 2 => q , Quit 
+# 3 => ! , Without
+# from comman mode click : and wq means write and quit 
+# q! : means Quit Without saving
+## We can use ! for exec commands
+--------------------------------------------------------------------------
+# inside comman mode click !COMMANDS
+```
+
+#### Vim - Modes
+
+<img title="" src="imgs/vim/vim-modes.png" alt="alt text" width="876">
+
+#### 3-Modes
+
+| mode         | Means                    | Go to using       |
+| ------------ | ------------------------ | ----------------- |
+| Command Mode | Default Mode & Read Only |                   |
+| insert       | Read Write               | i or press insert |
+| Exec Mode    | vim functions + saving   | :                 |
+
+##### Exec Modes Have 3 notes
+
+| Command | Means & uses |
+| ------- | ------------ |
+| w       | Write        |
+| q       | Quit         |
+| !       | Without      |
+
+```bash
+:q! means quit without saving
+:wq means First Save Then Quit
+:!{w,q} will get error will explain it In Next
+:w! means First Write without wirte ? in the end it's writing file
+```
+
+##### :!
+
+##### Means exec commands from vim Like :
+
+![vim_exec](imgs/vim/vim_exec.png)
+output  : ![vim_exec](imgs/vim/vim_after_exec.png)
+
+##### Seaching In vim
+
+1. cp /etc/passwd to use it as our lab
+
+![Searching](imgs/vim/before_seach.png)
+
+`in Command Mode Click /` For Get Into Search
+
+![Start Searching](imgs/vim/in_search_bar.png) 
+
+`Click N for get into next result`
+
+- Afterlooking for bash af keyword we got bash highlighted
+
+![highlighted](imgs/vim/while_search.png)
+
+Some Short-Cuts in Command Mode
+
+- small o for new line under line you where
+
+- Capetal O for New line above Line you where
+
+- double y for copy y means yank and Yeah means copy 
+
+- double d for Cut line & p for pest
+  
+  dN & yN  means Cut N lines from line i where and under this line
+  
+  ex d4d means Cut 4 line && And Same  instructions with y , y4y
+  
+  ![After Deleting](imgs/vim/before_delete.png)
+  
+  After Deleteing
+  
+  ![After Deleting](imgs/vim/After_deleting.png)
+
+d short cuts 
+
+- dl : delete Letter
+
+- dw : delete word
+
+---
+
+Some Short-Cuts in Command Mode Exec Mode
+
+- :N => goes to number N in this file 
+
+- :set number for showing number of lines in this file
+  
+  ![set number](imgs/vim/before_set_number.png)
+
+Write : then set number `TAB for autocomplete`
+
+![](imgs/vim/while_set_number.png)
+
+![After Adding Numbers](imgs/vim/After_set_number.png)
+
+- use `:set nonumber` to remove number
+
+- press u to undo instrtuction ex d4d & use u to return this 4 Lines or p for paste them again  
+
+- can can use cut 'd' in exec mode 
+  
+  - :7,15d means from Line number 7 to Line number 15 cut them  
+  
+  - :.,$ Means from Where i'm to the end of file cut them
+  
+  - :1,$ Means From Line number 1 to \$ cut them & $ means The end
+
+- gg == :1
+
+- GG == :$
+
+- Search & replace
+  
+  - :%s/root/not_root/g means for every root as keyword replace it to not_root
+    
+    - and g for all if you wanna for only first result remove g
+
+- if you have 2 files in the same dir and wanna cp file1 into file2 use :r file1 // file1 content will be in file2 and without exit from vim 
+
+---
+
+## Day 14
+
+### Boot Process
+
+`Press PowerON => call BOIS , BOIS doing POST for check if necessary hardware is available if false can't boot and get noise sound if true search for bootable device if found return true and boot else got will be get into black screen like termial but you can't write commands it's only a msg for you` 
+
+#### Power on => BOIS => POST => Detect Bootable Divices => Load IPL => Load MBR boot loader
+
+![MBR bootloader](https://neosmart.net/wiki/wp-content/uploads/sites/5/2015/01/MBR-Boot-Sequence.png)
+
+__Active partition Is IPL__
+
+### First Step Of boot sequence
+
+we will return to MBR again 
+
+<img src="https://thuc.space/images/master_boot_record/master_boot_record-format.png" title="" alt="MBR" width="780">
+
+We will foucs into boot loader and bigger part of MBR
+
+Linux Boot Loader is GRUB
+
+#### Grub => Kernel & Kernel Call systemd or init for starting Services
+
+#### For Small Size of MBR::boot & Destro developers Wanna add there imgs while booting & _normal imgs between 1M-5M_ so LOL , so Yeag they had maked 2 Stages 1st will be in MBR-boot who's have 446 & 1st Stage will call 2nd Stage and 2nd stage have all boot files and Distro imgs :smile:
+
+```bash
+$: du -sh /boot/grub/
+8.2M    /boot/grub/
+# how we wll save 8.2M into 446 Byte ?
+```
+
+### systemd
+
+systemd based on parallel programming so will be faster then init 
+
+| name    | based on    | Speed |
+| ------- | ----------- | ----- |
+| SYSTEMD | Parallel    | Fast  |
+| INIT    | independent | Slow  |
+
+older init was run log service sometime after running some services but systemd fixed this by making sys log runs before any service so systemd good and comataple with init `scripts` or upstart 
+
+#### systemd - Structure
+
+systemctl <opt> <service_name>
+
+```bash
+systemctl status ssh
+```
+
+- service info like up&running or up&stoped and service PATH and so on 
+
+![  ](./imgs/systemd/main.png)
+
+- service status tell you about service like up & running or not or disabled
+
+```bash
+# use systemd {disable , enable} <service_name>
+systemctl disable sshd.service
+systemctl enable sshdd.service
+```
+
+![ ](./imgs/systemd/service_status.png)
+
+- service enable or disable to tell you if you rebooted the machine systemd will start this service or you should run it manual every time you will reboot the machine
+
+![](./imgs/systemd/restart_status.png)
+
+next to enable is vendor present means by defualt this service enable or disabled
+
+- service PATH
+
+![](./imgs/systemd/service_path.png)
+
+- systemd readable then init 
+
+in `init` you will be able to write bash sctips but `systemd` based on key=value like this
+
+![](./imgs/systemd/read_service_code.png)
+
+- very small logs of service use `tail -f /var/log/$service_name` for follow logs in real time  
+
+![](./imgs/systemd/log.png)
+
+```bash
+systemctl start service_name # for make service up & running *if theren't any error*
+systemctl stop service_name # for stop service now
+systemctl enable service_name # for make service runs while system booting
+systemctl disable service_name # for make service can't run while system booting 
+systemctl is-enable service_name # asking for status for usage in scripting
+systemctl is-active service_name # not needable to explain 
+```
+
+#### masking service :
+
+means while you have service but you disabled it for spacific something you can use `systemctl mask service_name` if there another sys manger can runs this service he will see it's masking so he should call you for knowing why or he have hint like you masked nginx so apache should usable and nginx is not or int the end he will call you
+
+```bash
+$: systemctl mask ssh 
+Created symlink /etc/systemd/system/ssh.service → /dev/null.
+
+# he's only make symbolic link to point /dev/null
+# and while you trying to run service he will check you this service point to null or not 
+# if true return service is masked. else run service
+
+$: systemctl status ssh
+○ ssh.service
+     Loaded: masked (Reason: Unit ssh.service is masked.)
+     Active: inactive (dead) since Thu 2024-02-01 22:12:04 EET; 6s ago
+   Main PID: 25112 (code=exited, status=0/SUCCESS)
+        CPU: 35ms
+
+Feb 01 21:58:55 G580 systemd[1]: Starting OpenBSD Secure Shell server...
+Feb 01 21:58:55 G580 sshd[25112]: Server listening on 0.0.0.0 port 22.
+Feb 01 21:58:55 G580 sshd[25112]: Server listening on :: port 22.
+Feb 01 21:58:55 G580 systemd[1]: Started OpenBSD Secure Shell server.
+Feb 01 22:11:49 G580 systemd[1]: ssh.service: Current command vanished from the unit file, execution>
+Feb 01 22:12:04 G580 systemd[1]: Stopping ssh.service...
+Feb 01 22:12:04 G580 sshd[25112]: Received signal 15; terminating.
+Feb 01 22:12:04 G580 systemd[1]: ssh.service: Deactivated successfully.
+Feb 01 22:12:04 G580 systemd[1]: Stopped ssh.service.
+$: systemctl start ssh # while trying to run it you will get slap in your face tell you this service is already masked 
+Failed to start ssh.service: Unit ssh.service is masked.
+```
+
+#### System Targets & init run levels
+
+| init | systyemd                | Means                                   |
+| ---- | ----------------------- | --------------------------------------- |
+| 0    | poweroff.trage          | power off                               |
+| 1    | rescue.traget           | sinlge user mode troubleshooting        |
+| 2    | 2,3 = multi-user.target | TTY Without NFS `Network File Shareing` |
+| 3    |                         | TTY only  `Multi user mode`             |
+| 4    | NULL                    | unsed                                   |
+| 5    | graphecal.traget        | GUI `Multi user GUI`                    |
+| 6    | reboot.target           | reboot                                  |
+
+```bash
+# Get Defualt Target in systemd 
+$: systemctl get-defualt # or runlevel 
+multi-user.target
+# For Setting use set-defualt
+$: systemctl set-defualt {graphical,multi}.traget
+# it's based on symbolic link in c++ is pointers
+# for now transfer between tragets in real time use isolate <traget> couse set-defualt shoud reboot system
+$: systemctl isolate graphical.traget    
+```
+
+#### systemd files
+
+```bash
+$: ls -lahd /etc/systemd/
+drwxr-xr-x 5 root root 4.0K Dec 23 14:14 /etc/systemd/
+$: ls -lah /etc/systemd/
+total 64K
+drwxr-xr-x   5 root root 4.0K Dec 23 14:14 .
+drwxr-xr-x 171 root root  12K Jan 31 08:45 ..
+-rw-r--r--   1 root root 1.3K Apr  7  2022 journald.conf
+-rw-r--r--   1 root root 1.4K Apr  7  2022 logind.conf
+drwxr-xr-x   2 root root 4.0K Apr  7  2022 network
+-rw-r--r--   1 root root  846 Mar 11  2022 networkd.conf
+-rw-r--r--   1 root root  670 Mar 11  2022 pstore.conf
+-rw-r--r--   1 root root 1.4K Apr  7  2022 resolved.conf
+-rw-r--r--   1 root root  931 Mar 11  2022 sleep.conf
+drwxr-xr-x  23 root root 4.0K Feb  1 22:13 system
+-rw-r--r--   1 root root 2.0K Apr  7  2022 system.conf
+-rw-r--r--   1 root root  748 Apr  7  2022 timesyncd.conf
+drwxr-xr-x   7 root root 4.0K Aug  9  2022 user
+-rw-r--r--   1 root root 1.4K Apr  7  2022 user.conf
+# all service in /lib/systemd but /etc/systemd for only necessary services or enabled service like ssh or apache 
+$: ls -l /lib/system/system # all service
+$: ls -l /etc/system/system # necessary service or enabled services
+# link between /lib & etc for systemd 
+$: ls -lah /lib/systemd/systemd
+drwxr-xr-x  2 root root 4.0K Dec 23 11:28  sockets.target.wants
+lrwxrwxrwx  1 root root   31 Dec 23 11:17  sshd.service -> /lib/systemd/system/ssh.service
+lrwxrwxrwx  1 root root    9 Feb  1 22:13  ssh.service -> /dev/null
+lrwxrwxrwx  1 root root    9 Dec 23 11:17  sudo.service -> /dev/null
+drwxr-xr-x  2 root root 4.0K Dec 23 11:28  sysinit.target.wants
+lrwxrwxrwx  1 root root   35 Dec 23 11:17  syslog.service -> /lib/systemd/system/rsyslog.service
+drwxr-xr-x  2 root root 4.0K Jan 30 21:33  sysstat.service.wants
+drwxr-xr-x  2 root root 4.0K Jan 20 21:12  timers.target.wants
+-rw-r--r--  1 root root  382 Jan  8 20:37 'var-snap-firefox-common-host\x2dhunspell.mount'
+# and some service point to null for making it masked like ssh and sshd
+```
+
+---
